@@ -1,2 +1,3 @@
-# inventory-jaya-timur
-Inventory System for PT Jaya Timur
+# Inventory System PT Jaya Timur
+> Link Project Timeline
+The project timeline build using [ClickUp](https://app.clickup.com/).
