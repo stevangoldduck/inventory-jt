@@ -10,4 +10,4 @@ After cloning this, run npm command to add node_modules into our project by runn
 `npm install --global cross-env && npm install --no-bin-links && npm run dev`
 </br> </br>
 Run the migration command
-`php artisan migrate` . Default fb name is **inventory_jt**, but if you are willing to change it, just change in your **.env** file.
+`php artisan migrate` . Default db name is **inventory_jt**, but if you are willing to change it, just change in your **.env** file.
