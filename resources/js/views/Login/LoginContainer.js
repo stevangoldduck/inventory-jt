@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { Link, Redirect, withRouter } from 'react-router-dom';
 import FlashMessage from 'react-flash-message';
+import logo from '../../images/company/logo.jpg';
+import '../../styles/Login.css';
 class LoginContainer extends Component {
     constructor(props) {
         super(props);
@@ -35,15 +37,16 @@ class LoginContainer extends Component {
         e.preventDefault();
         this.setState({ formSubmitting: true });
         let userData = this.state.user;
-        axios.post("/api/auth/login", userData).then(response => {
+        axios.post("api/login", userData).then(response => {
+            //console.log(response);
             return response;
         }).then(json => {
             if (json.data.success) {
                 let userData = {
-                    id: json.data.id,
-                    name: json.data.name,
-                    email: json.data.email,
-                    access_token: json.data.access_token,
+                    id: json.data.success.id,
+                    name: json.data.success.name,
+                    email: json.data.success.email,
+                    access_token: json.data.success.token,
                 };
                 let appState = {
                     isLoggedIn: true,
@@ -107,34 +110,33 @@ class LoginContainer extends Component {
         const { state = {} } = this.state.redirect;
         const { error } = state;
         return (
-            <div className="container">
+            <div className="container login-container">
                 <div className="row">
-                    <div className="offset-xl-3 col-xl-6 offset-lg-1 col-lg-10 col-md-12 col-sm-12 col-12 ">
-                        <h2 className="text-center mb30">Log In To Your Account</h2>
-                        {this.state.isLoggedIn ? <FlashMessage duration={60000} persistOnHover={true}>
-                            <h5 className={"alert alert-success"}>Login successful, redirecting...</h5></FlashMessage> : ''}
-                        {this.state.error ? <FlashMessage duration={100000} persistOnHover={true}>
-                            <h5 className={"alert alert-danger"}>Error: {this.state.error}</h5></FlashMessage> : ''}
-                        {error && !this.state.isLoggedIn ? <FlashMessage duration={100000} persistOnHover={true}>
-                            <h5 className={"alert alert-danger"}>Error: {error}</h5></FlashMessage> : ''}
-                        <form onSubmit={this.handleSubmit}>
-                            <div className="form-group">
-                                <input id="email" type="email" name="email" placeholder="E-mail" className="form-control" required onChange={this.handleEmail} />
-                            </div>
-                            <div className="form-group">
-                                <input id="password" type="password" name="password" placeholder="Password" className="form-control" required onChange={this.handlePassword} />
-                            </div>
-                            <button disabled={this.state.formSubmitting} type="submit" name="singlebutton" className="btn btn-default btn-lg  btn-block mb10"> {this.state.formSubmitting ? "Logging You In..." : "Log In"} </button>
-                        </form>
+                    <div className="offset-xl-3 col-xl-6 offset-lg-1 col-lg-10 col-md-12 col-sm-12 col-12 login-form-1">
+                        <div className="text-center">
+                            <img src={logo} />
+                            <br></br><br></br>
+                        <h5>Inventory System PT. Jaya Timur</h5>
+                        </div>
+                            {this.state.isLoggedIn ? <FlashMessage duration={60000} persistOnHover={true}>
+                                <h5 className={"alert alert-success"}>Login successful, redirecting...</h5></FlashMessage> : ''}
+                            {this.state.error ? <FlashMessage duration={100000} persistOnHover={true}>
+                                <h5 className={"alert alert-danger"}>Error: {this.state.error}</h5></FlashMessage> : ''}
+                            {error && !this.state.isLoggedIn ? <FlashMessage duration={100000} persistOnHover={true}>
+                                <h5 className={"alert alert-danger"}>Error: {error}</h5></FlashMessage> : ''}
+                            <form onSubmit={this.handleSubmit}>
+                                <div className="form-group">
+                                    <input id="email" type="email" name="email" placeholder="E-mail" className="form-control bg-field" required onChange={this.handleEmail} />
+                                </div>
+                                <div className="form-group">
+                                    <input id="password" type="password" name="password" placeholder="Password" className="form-control bg-field" required onChange={this.handlePassword} />
+                                </div>
+                                <button disabled={this.state.formSubmitting} type="submit" name="singlebutton" className=" text-light btnSubmit mb10"> {this.state.formSubmitting ? "Logging You In..." : "Log In"} </button>
+                            </form>
+                        </div>
                     </div>
-                    <p className="text-white">Don't have an account? <Link to="/register" className="text-yellow"> Register</Link>
-                        <span className="pull-right">
-                            <Link to="/" className="text-white">Back to Index</Link>
-                        </span>
-                    </p>
                 </div>
-            </div>
-        )
-    }
-}
-export default withRouter(LoginContainer);
+                )
+            }
+        }
+        export default withRouter(LoginContainer);

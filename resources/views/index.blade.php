@@ -6,17 +6,15 @@
 
         <!-- CSRF Token -->
         <meta name="csrf-token" content="{{ csrf_token() }}">
-        <title>Laravel</title>
+        <title>Inventory JT</title>
 
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com/css?family=Nunito:200,600" rel="stylesheet">
         <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     </head>
     <body>
-        <div class="flex-center position-ref full-height">
-            <div class="content" id="index">
+        <div id="index">
 
-            </div>
         </div>
     </body>
     <script type="text/javascript" src="js/app.js"></script>
