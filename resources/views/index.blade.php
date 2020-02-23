@@ -14,7 +14,7 @@
     </head>
     <body>
         <div class="flex-center position-ref full-height">
-            <div class="content" id="welcome">
+            <div class="content" id="index">
 
             </div>
         </div>
