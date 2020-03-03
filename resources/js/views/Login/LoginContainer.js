@@ -46,6 +46,7 @@ class LoginContainer extends Component {
                     id: json.data.success.id,
                     name: json.data.success.name,
                     email: json.data.success.email,
+                    role: json.data.success.role,
                     access_token: json.data.success.token,
                 };
                 let appState = {
@@ -116,27 +117,29 @@ class LoginContainer extends Component {
                         <div className="text-center">
                             <img src={logo} />
                             <br></br><br></br>
-                        <h5>Inventory System PT. Jaya Timur</h5>
+                            <h5>Inventory System PT. Jaya Timur</h5>
                         </div>
-                            {this.state.isLoggedIn ? <FlashMessage duration={60000} persistOnHover={true}>
-                                <h5 className={"alert alert-success"}>Login successful, redirecting...</h5></FlashMessage> : ''}
-                            {this.state.error ? <FlashMessage duration={100000} persistOnHover={true}>
-                                <h5 className={"alert alert-danger"}>Error: {this.state.error}</h5></FlashMessage> : ''}
-                            {error && !this.state.isLoggedIn ? <FlashMessage duration={100000} persistOnHover={true}>
-                                <h5 className={"alert alert-danger"}>Error: {error}</h5></FlashMessage> : ''}
-                            <form onSubmit={this.handleSubmit}>
-                                <div className="form-group">
-                                    <input id="email" type="email" name="email" placeholder="E-mail" className="form-control bg-field" required onChange={this.handleEmail} />
-                                </div>
-                                <div className="form-group">
-                                    <input id="password" type="password" name="password" placeholder="Password" className="form-control bg-field" required onChange={this.handlePassword} />
-                                </div>
-                                <button disabled={this.state.formSubmitting} type="submit" name="singlebutton" className=" text-light btnSubmit mb10"> {this.state.formSubmitting ? "Logging You In..." : "Log In"} </button>
-                            </form>
-                        </div>
+                        <form onSubmit={this.handleSubmit}>
+                            <div className="form-group">
+                                {this.state.isLoggedIn ? <FlashMessage duration={60000} persistOnHover={true}>
+                                    <h5 className={"alert alert-success"}>Login successful, redirecting...</h5></FlashMessage> : ''}
+                                {this.state.error ? <FlashMessage duration={100000} persistOnHover={true}>
+                                    <h5 className={"alert alert-danger"}>Error: {this.state.error}</h5></FlashMessage> : ''}
+                                {error && !this.state.isLoggedIn ? <FlashMessage duration={100000} persistOnHover={true}>
+                                    <h5 className={"alert alert-danger"}>Error: {error}</h5></FlashMessage> : ''}
+                            </div>
+                            <div className="form-group">
+                                <input id="email" type="email" name="email" placeholder="E-mail" className="form-control bg-field" required onChange={this.handleEmail} />
+                            </div>
+                            <div className="form-group">
+                                <input id="password" type="password" name="password" placeholder="Password" className="form-control bg-field" required onChange={this.handlePassword} />
+                            </div>
+                            <button disabled={this.state.formSubmitting} type="submit" name="singlebutton" className=" text-light btnSubmit mb10"> {this.state.formSubmitting ? "Logging You In..." : "Log In"} </button>
+                        </form>
                     </div>
                 </div>
-                )
-            }
-        }
-        export default withRouter(LoginContainer);
+            </div>
+        )
+    }
+}
+export default withRouter(LoginContainer);
