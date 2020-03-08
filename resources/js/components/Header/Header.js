@@ -37,6 +37,22 @@ class Header extends Component {
                         <ul className="navbar-nav ml-auto">
                             {this.state.isLoggedIn ?
                                 <li><Link className="nav-link" to="/dashboard">Dashboard</Link></li> : ""}
+
+                            {this.state.isLoggedIn ?
+                            <li className="nav-item dropdown">
+                                <Link className="nav-link dropdown-toggle"  href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" >Products</Link>
+                                <div className="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    <a className="dropdown-item" href="#">Product List</a>
+                                    <a className="dropdown-item" href="#">Product Category</a>
+                                </div>
+                            </li>: ""}
+
+                            {this.state.isLoggedIn && this.state.user.role == "admin" ?
+                            <li>
+                                <Link className="nav-link" to="/accounts">Accounts</Link>
+
+                            </li>: ""}
+
                             {this.state.isLoggedIn ?
                                 <li><Link className="nav-link" onClick={this.logOut}>Logout</Link></li> : ""}
                             {!this.state.isLoggedIn ?

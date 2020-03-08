@@ -21,6 +21,7 @@ class AuthController extends Controller
             $success['id'] = $user->id;
             $success['name'] = $user->name;
             $success['email'] = $user->email;
+            $success['role'] = $user->role;
             return response()->json(['success' => $success], $this->successStatus);
         }
         else
