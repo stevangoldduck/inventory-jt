@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import Header from '../../../components/Header/Header';
-import Footer from '../../../components/Footer/Footer';
 class Home extends Component {
     constructor() {
         super();
@@ -24,22 +23,37 @@ class Home extends Component {
                 <Header userData={this.state.user} userIsLoggedIn={this.state.isLoggedIn} />
                 <div className="container">
                     <div className="row">
-                        <div className="col-sm-12">
-                            <div className="card text-center" style={{ marginTop: '15px' }}>
-                                <div className="card-header">
-                                    Featured
-                                </div>
-                                <div className="card-body">
-                                    <h5 className="card-title">Special title treatment</h5>
-                                    <p className="card-text">With supporting text below as a natural lead-in to additional content.</p>
-                                    <a href="#" className="btn btn-primary">Go somewhere</a>
+                        <div className="col-sm-4 mt-5">
+                            <div className="card text-white bg-primary mb-3" style={{ maxWidth: "18 rem" }}>
+                                <div className="card-header">Sales</div>
+                                <div className="card-body text-center">
+                                    <h2 className="card-title">Rp. 5.500.000</h2>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div className="row">
-                        <div className="col-sm-12">
-
+                        <div className="col-sm-4 mt-5">
+                            <div className="card text-white bg-success mb-3" style={{ maxWidth: "18 rem" }}>
+                                <div className="card-header">Total Products</div>
+                                <div className="card-body text-center">
+                                    <h2 className="card-title">34</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="col-sm-4 mt-5">
+                            <div className="card text-white bg-danger mb-3" style={{ maxWidth: "18 rem" }}>
+                                <div className="card-header">Request Form</div>
+                                <div className="card-body text-center">
+                                    <h2 className="card-title">12</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="col-sm-4 mt-5">
+                            <div className="card text-white bg-dark mb-3" style={{ maxWidth: "18 rem" }}>
+                                <div className="card-header">DO Form</div>
+                                <div className="card-body text-center">
+                                    <h2 className="card-title">12</h2>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
