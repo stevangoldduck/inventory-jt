@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\User;
 use Illuminate\Support\Facades\Validator;
-use phpseclib\Crypt\Hash;
+use Hash;
 
 class UserController extends Controller
 {
