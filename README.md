@@ -6,8 +6,9 @@
 ![Diagram Flow](/docs/FlowChartInventJT.png)
 
 ### Implementation
-After cloning this, run npm command to add node_modules into our project by running </br>
-`npm install --global cross-env && npm install --no-bin-links && npm run dev`
-</br> </br>
-Run the migration command
-`php artisan migrate` . Default db name is **inventory_jt**, but if you are willing to change it, just change in your **.env** file.
+copy `.env.example` , rename to `.env` -> setup your connection to DB
+1. run `composer install`</br>
+2. `npm install && npm run dev`</br>
+3. `php artisan key:generate`</br>
+4. `php artisan migrate`</br>
+5. `php artisan passport:install`</br>
