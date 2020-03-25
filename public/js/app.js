@@ -76581,7 +76581,7 @@ module.exports = "/images/logo.jpg?9180def31364854fa6ec2f3512fddb3d";
 /*!****************************************!*\
   !*** ./resources/js/states/actions.js ***!
   \****************************************/
-/*! exports provided: addAccount, removeAccount, fetchArticleDetails, setArticleDetails */
+/*! exports provided: addAccount, removeAccount, fetchArticleDetails, fetchAccountBegin, setArticleDetails, fetchAccountFailure */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -76589,7 +76589,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "addAccount", function() { return addAccount; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "removeAccount", function() { return removeAccount; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "fetchArticleDetails", function() { return fetchArticleDetails; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "fetchAccountBegin", function() { return fetchAccountBegin; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "setArticleDetails", function() { return setArticleDetails; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "fetchAccountFailure", function() { return fetchAccountFailure; });
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
+
 function addAccount(account) {
   var name = account.name,
       email = account.email,
@@ -76614,23 +76619,36 @@ function removeAccount(id) {
 }
 function fetchArticleDetails(config) {
   return function (dispatch) {
-    return axios.get("api/get-user", config).then(function (_ref) {
-      var response = _ref.response;
-      dispatch(setArticleDetails(response.data.list_user));
+    dispatch(fetchAccountBegin());
+    return axios__WEBPACK_IMPORTED_MODULE_0___default.a.get("api/get-user", config).then(function (response) {
+      dispatch(setArticleDetails(response.data.list_user)); //return response.data.list_user;
+    })["catch"](function (e) {
+      return dispatch(fetchAccountFailure(e));
     });
   };
 }
+var fetchAccountBegin = function fetchAccountBegin() {
+  return {
+    type: "FETCH_ACCOUNT_BEGIN"
+  };
+};
 function setArticleDetails(data) {
-  var name = data.name,
-      email = data.email,
-      role = data.role;
+  // const { name, email,  role } = data;
   return {
     type: "GET_ACCOUNT",
-    name: name,
-    email: email,
-    role: role
+    payload: {
+      data: data
+    }
   };
 }
+var fetchAccountFailure = function fetchAccountFailure(error) {
+  return {
+    type: "FETCH_ACCOUNT_FAILURE",
+    payload: {
+      error: error
+    }
+  };
+};
 
 /***/ }),
 
@@ -76644,42 +76662,58 @@ function setArticleDetails(data) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var redux__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! redux */ "./node_modules/redux/es/redux.js");
-function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
-function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
-function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
-
-function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 
+var initialState = {
+  items: [],
+  loading: false,
+  error: null
+};
 
 function accounts() {
-  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
   var action = arguments.length > 1 ? arguments[1] : undefined;
 
   switch (action.type) {
     case "ADD_ACCOUNT":
       // Add new account
-      return [].concat(_toConsumableArray(state), [{
+      return _objectSpread({}, state, {
         name: action.name,
         email: action.email,
         password: action.password,
         role: action.role
-      }]);
+      });
 
     case "GET_ACCOUNT":
       // Add new account
-      return [].concat(_toConsumableArray(state), [{
-        name: action.name,
-        email: action.email,
-        role: action.role
-      }]);
+      return _objectSpread({}, state, {
+        items: action.payload
+      });
 
     case "REMOVE_ACCOUNT":
       // Delete account
-      return state.filter(function (accounts) {
-        return accounts.id !== action.id;
+      return state.items.data.filter(function (accounts) {
+        return accounts !== action.id;
+      });
+
+    case "FETCH_ACCOUNT_FAILURE":
+      return _objectSpread({}, state, {
+        loading: false,
+        error: action.payload.error,
+        items: []
+      });
+
+    case "FETCH_ACCOUNT_BEGIN":
+      // Mark the state as "loading" so we can show a spinner or something
+      // Also, reset any errors. We're starting fresh.
+      return _objectSpread({}, state, {
+        loading: true,
+        error: null
       });
 
     default:
@@ -77472,10 +77506,16 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/es/index.js");
 /* harmony import */ var _components_Header_Header__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../components/Header/Header */ "./resources/js/components/Header/Header.js");
-/* harmony import */ var _AccountList__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./AccountList */ "./resources/js/views/user/Account/AccountList.js");
-/* harmony import */ var _AccountItem__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./AccountItem */ "./resources/js/views/user/Account/AccountItem.js");
-/* harmony import */ var _states_actions__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../../states/actions */ "./resources/js/states/actions.js");
+/* harmony import */ var _states_actions__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../states/actions */ "./resources/js/states/actions.js");
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
+
+function _iterableToArrayLimit(arr, i) { if (!(Symbol.iterator in Object(arr) || Object.prototype.toString.call(arr) === "[object Arguments]")) { return; } var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -77492,8 +77532,6 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
-
 
 
 
@@ -77545,9 +77583,7 @@ function (_Component) {
           'Authorization': "Bearer ".concat(this.state.user.access_token)
         }
       };
-      this.setState({
-        listUser: this.props.fetchArticleDetails(config)
-      }); //axios.get('api/get-user', config).then(response => { this.setState({ listUser: response.data.list_user }) })
+      this.props.fetchAccount(config);
     }
   }, {
     key: "render",
@@ -77708,24 +77744,26 @@ function (_Component) {
         className: "card-body"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("table", {
         className: "table table-striped"
-      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("thead", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", null, "Name"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", null, "Email"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", null, "Action")), this.state.listUser.map(function (person) {
-        return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, person.name), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, person.email), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
-          className: "btn btn-warning"
-        }, "View ", person.id)));
-      })))))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("thead", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", null, "Name"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", null, "Email"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", null, "Action")), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, Object.entries(accounts.accounts.items).map(function (_ref) {
+        var _ref2 = _slicedToArray(_ref, 2),
+            key = _ref2[0],
+            value = _ref2[1];
+
+        return value.map(function (el) {
+          return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", {
+            key: el.id
+          }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, el.name), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, el.email), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+            onClick: function onClick() {
+              removeExistingAccount(el.id);
+            },
+            className: "btn btn-sm btn-danger"
+          }, "Delete")));
+        });
+      }))))))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "row"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "col-sm-12"
-      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_AccountList__WEBPACK_IMPORTED_MODULE_3__["default"], null, accounts.map(function (account) {
-        return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_AccountItem__WEBPACK_IMPORTED_MODULE_4__["default"], {
-          key: account.id,
-          name: account.name,
-          role: account.role,
-          onClickDelete: function onClickDelete() {
-            return removeExistingAccount(account.id);
-          }
-        });
-      }))))));
+      }))));
     }
   }]);
 
@@ -77733,8 +77771,7 @@ function (_Component) {
 }(react__WEBPACK_IMPORTED_MODULE_0__["Component"]); // Get state from store and pass it
 
 
-var mapStateToProps = function mapStateToProps(_ref) {
-  var accounts = _ref.accounts;
+var mapStateToProps = function mapStateToProps(accounts) {
   return {
     accounts: accounts
   };
@@ -77744,82 +77781,18 @@ var mapStateToProps = function mapStateToProps(_ref) {
 var mapDispatchToProps = function mapDispatchToProps(dispatch) {
   return {
     addNewAccount: function addNewAccount(accounts) {
-      dispatch(Object(_states_actions__WEBPACK_IMPORTED_MODULE_5__["addAccount"])(accounts));
+      dispatch(Object(_states_actions__WEBPACK_IMPORTED_MODULE_3__["addAccount"])(accounts));
     },
     removeExistingAccount: function removeExistingAccount(contactID) {
-      dispatch(Object(_states_actions__WEBPACK_IMPORTED_MODULE_5__["removeAccount"])(contactID));
+      dispatch(Object(_states_actions__WEBPACK_IMPORTED_MODULE_3__["removeAccount"])(contactID));
+    },
+    fetchAccount: function fetchAccount(config) {
+      dispatch(Object(_states_actions__WEBPACK_IMPORTED_MODULE_3__["fetchArticleDetails"])(config));
     }
   };
 };
 
 /* harmony default export */ __webpack_exports__["default"] = (Object(react_redux__WEBPACK_IMPORTED_MODULE_1__["connect"])(mapStateToProps, mapDispatchToProps)(Account));
-
-/***/ }),
-
-/***/ "./resources/js/views/user/Account/AccountItem.js":
-/*!********************************************************!*\
-  !*** ./resources/js/views/user/Account/AccountItem.js ***!
-  \********************************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-
-
-var Accounttem = function Accounttem(_ref) {
-  var id = _ref.id,
-      name = _ref.name,
-      email = _ref.email,
-      password = _ref.password,
-      role = _ref.role,
-      onClickDelete = _ref.onClickDelete;
-  return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-    className: "ContactItem"
-  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", {
-    className: "ContactItem__id"
-  }, id), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", {
-    className: "ContactItem__name"
-  }, name), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", {
-    className: "ContactItem__email"
-  }, email), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", {
-    className: "ContactItem__pass"
-  }, password), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", {
-    className: "ContactItem__phone"
-  }, role), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
-    type: "button",
-    className: "ContactItem__button",
-    onClick: onClickDelete
-  }, "Delete"));
-};
-
-/* harmony default export */ __webpack_exports__["default"] = (Accounttem);
-
-/***/ }),
-
-/***/ "./resources/js/views/user/Account/AccountList.js":
-/*!********************************************************!*\
-  !*** ./resources/js/views/user/Account/AccountList.js ***!
-  \********************************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-
-
-var AccountList = function AccountList(_ref) {
-  var children = _ref.children;
-  return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-    className: "AccountList"
-  }, children);
-};
-
-/* harmony default export */ __webpack_exports__["default"] = (AccountList);
 
 /***/ }),
 

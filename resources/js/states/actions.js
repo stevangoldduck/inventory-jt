@@ -1,3 +1,5 @@
+import axios from 'axios';
+
 export function addAccount(account) {
     const { name, email, password, role } = account;
     return {
@@ -22,21 +24,30 @@ export function removeAccount(id) {
 }
 
 export function fetchArticleDetails(config) {
-    return function (dispatch) {
-        return axios.get("api/get-user",config)
-            .then(({ response }) => {
+    return dispatch => {
+        dispatch(fetchAccountBegin());
+        return axios.get("api/get-user", config)
+            .then(response => {
                 dispatch(setArticleDetails(response.data.list_user));
-            });
+                //return response.data.list_user;
+            })
+            .catch(e=>dispatch(fetchAccountFailure(e)));
     };
 }
 
-export function setArticleDetails(data)
-{
-    const { name, email,  role } = data;
+export const fetchAccountBegin = () => ({
+    type: "FETCH_ACCOUNT_BEGIN"
+});
+
+export function setArticleDetails(data) {
+    // const { name, email,  role } = data;
     return {
         type: "GET_ACCOUNT",
-        name,
-        email,
-        role
+        payload: { data }
     };
 }
+
+export const fetchAccountFailure = error => ({
+    type: "FETCH_ACCOUNT_FAILURE",
+    payload: { error }
+});
