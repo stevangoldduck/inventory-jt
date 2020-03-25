@@ -7,9 +7,20 @@ function accounts(state = [], action) {
             return [
                 ...state,
                 {
-                    id: action.id,
                     name: action.name,
-                    phone: action.phone
+                    email: action.email,
+                    password: action.password,
+                    role : action.role
+                }
+            ];
+        case "GET_ACCOUNT":
+            // Add new account
+            return [
+                ...state,
+                {
+                    name: action.name,
+                    email: action.email,
+                    role : action.role
                 }
             ];
         case "REMOVE_ACCOUNT":

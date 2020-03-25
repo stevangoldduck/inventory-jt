@@ -10,7 +10,9 @@ class Account extends Component {
         this.state = {
             id: "",
             name: "",
-            phone: "",
+            email: "",
+            password: "",
+            role: "",
             user: {},
             listUser: [],
             isLoggedIn: false
@@ -24,23 +26,20 @@ class Account extends Component {
             let AppState = JSON.parse(state);
             this.setState({ isLoggedIn: AppState.isLoggedIn, user: AppState.user });
         }
-
-
     }
 
-    componentDidMount()
-    {
+    componentDidMount() {
         const config =
         {
-            headers: { 'Authorization': `Bearer ${this.state.user.access_token}`}
+            headers: { 'Authorization': `Bearer ${this.state.user.access_token}` }
         }
-
-        axios.get('api/get-user',config).then( response => { this.setState({listUser:response.data.list_user}) } )
+        this.setState({listUser: this.props.fetchArticleDetails(config)})
+        //axios.get('api/get-user', config).then(response => { this.setState({ listUser: response.data.list_user }) })
     }
 
 
     render() {
-        const { id, name, phone } = this.state;
+        const { name, email, password, role } = this.state;
         const { accounts, addNewAccount, removeExistingAccount } = this.props;
         return (
             <div>
@@ -50,44 +49,72 @@ class Account extends Component {
                         <div className="col-sm-4">
                             <div className="card text-center" style={{ marginTop: '15px' }}>
                                 <div className="card-body">
-                                    <div className="form-group">
-                                        <input
-                                            type="text"
-                                            value={id}
-                                            onChange={event => this.setState({ id: event.target.value })}
-                                            className="form-control"
-                                            placeholder="Id"
-                                        />
+                                    <div class="list-group">
+                                        <a href="#" role="button" data-toggle="modal" data-target="#exampleModal" class="list-group-item list-group-item-action list-group-item-primary">Create Account</a>
                                     </div>
-                                    <div className="form-group">
-                                        <input
-                                            type="text"
-                                            value={name}
-                                            onChange={event => this.setState({ name: event.target.value })}
-                                            className="form-control"
-                                            placeholder="Name"
-                                        />
+                                </div>
+                            </div>
+                        </div>
+                        <div className="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div className="modal-dialog" role="document">
+                                <div className="modal-content">
+                                    <div className="modal-header">
+                                        <h5 className="modal-title" id="exampleModalLabel">Create User Account</h5>
+                                        <button type="button" className="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
                                     </div>
-                                    <div className="form-group">
-                                        <input
-                                            type="text"
-                                            value={phone}
-                                            onChange={event => this.setState({ phone: event.target.value })}
-                                            className="form-control"
-                                            placeholder="Phone"
-                                        />
+                                    <div className="modal-body">
+                                        <div className="row">
+                                            <div className="col-lg-12">
+                                                <div className="form-group">
+                                                    <input
+                                                        type="text"
+                                                        value={name}
+                                                        onChange={event => this.setState({ name: event.target.value })}
+                                                        className="form-control"
+                                                        placeholder="Name"
+                                                    />
+                                                </div>
+                                                <div className="form-group">
+                                                    <input
+                                                        type="email"
+                                                        value={email}
+                                                        onChange={event => this.setState({ email: event.target.value })}
+                                                        className="form-control"
+                                                        placeholder="Phone"
+                                                    />
+                                                </div>
+                                                <div className="form-group">
+                                                    <input
+                                                        type="password"
+                                                        value={password}
+                                                        onChange={event => this.setState({ password: event.target.value })}
+                                                        className="form-control"
+                                                        placeholder="Phone"
+                                                    />
+                                                </div>
+                                                <div className="form-group">
+                                                    <select className="form-control" onChange={event => this.setState({ role: event.target.value })}>
+                                                        <option value="admin">Admin</option>
+                                                        <option value="storeman">Storeman</option>
+                                                        <option value="stockman">Stockman</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div className="form-group">
+                                    <div className="modal-footer">
+                                        <button type="button" className="btn btn-secondary" data-dismiss="modal">Close</button>
                                         <button
                                             type="button"
                                             onClick={() => {
-                                                if (!name || !phone) {
+                                                if (!name || !password || !email) {
                                                     alert("Field cannot be empty !");
                                                     return;
                                                 }
-
-                                                this.setState({ id: "", name: "", phone: "" });
-                                                addNewAccount({ id, name, phone });
+                                                this.setState({ name: "", email: "", password: "", role: "" });
+                                                addNewAccount({ name, email, password, role });
                                             }}
                                             className="btn btn-info"
                                         >
@@ -100,14 +127,14 @@ class Account extends Component {
                         <div className="col-sm-8">
                             <div className="card text-center" style={{ marginTop: '15px' }}>
                                 <div className="card-body">
-                                        <table className="table table-striped">
-                                            <thead>
-                                                <th>Name</th>
-                                                <th>Email</th>
-                                                <th>Action</th>
-                                            </thead>
-                                            {this.state.listUser.map( person => <tr><td>{person.name}</td><td>{person.email}</td><td><button className="btn btn-warning">View</button></td></tr>)}
-                                        </table>
+                                    <table className="table table-striped">
+                                        <thead>
+                                            <th>Name</th>
+                                            <th>Email</th>
+                                            <th>Action</th>
+                                        </thead>
+                                        {this.state.listUser.map(person => <tr><td>{person.name}</td><td>{person.email}</td><td><button className="btn btn-warning">View {person.id}</button></td></tr>)}
+                                    </table>
                                 </div>
                             </div>
                         </div>
@@ -120,7 +147,7 @@ class Account extends Component {
                                         <AccountItem
                                             key={account.id}
                                             name={account.name}
-                                            phone={account.phone}
+                                            role={account.role}
                                             onClickDelete={() => removeExistingAccount(account.id)}
                                         />
                                     );
