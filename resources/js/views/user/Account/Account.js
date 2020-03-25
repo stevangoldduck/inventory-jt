@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from "react-redux";
 import Header from '../../../components/Header/Header';
-import AccountList from './AccountList';
-import AccountItem from './AccountItem';
-import { addAccount, removeAccount } from "../../../states/actions";
+import { addAccount, removeAccount, fetchArticleDetails } from "../../../states/actions";
 class Account extends Component {
     constructor(props) {
         super(props);
@@ -33,10 +31,9 @@ class Account extends Component {
         {
             headers: { 'Authorization': `Bearer ${this.state.user.access_token}` }
         }
-        this.setState({listUser: this.props.fetchArticleDetails(config)})
-        //axios.get('api/get-user', config).then(response => { this.setState({ listUser: response.data.list_user }) })
-    }
 
+        this.props.fetchAccount(config)
+    }
 
     render() {
         const { name, email, password, role } = this.state;
@@ -133,7 +130,14 @@ class Account extends Component {
                                             <th>Email</th>
                                             <th>Action</th>
                                         </thead>
-                                        {this.state.listUser.map(person => <tr><td>{person.name}</td><td>{person.email}</td><td><button className="btn btn-warning">View {person.id}</button></td></tr>)}
+                                        <tbody>
+                                            {
+                                                Object.entries(accounts.accounts.items).map(([key, value]) => (
+                                                    value.map(el => <tr key={el.id}><td>{el.name}</td><td>{el.email}</td><td><button onClick={()=>{removeExistingAccount(el.id)}} className="btn btn-sm btn-danger">Delete</button></td></tr> )
+                                                ))
+                                            }
+                                        </tbody>
+
                                     </table>
                                 </div>
                             </div>
@@ -141,18 +145,7 @@ class Account extends Component {
                     </div>
                     <div className="row">
                         <div className="col-sm-12">
-                            <AccountList>
-                                {accounts.map(account => {
-                                    return (
-                                        <AccountItem
-                                            key={account.id}
-                                            name={account.name}
-                                            role={account.role}
-                                            onClickDelete={() => removeExistingAccount(account.id)}
-                                        />
-                                    );
-                                })}
-                            </AccountList>
+
                         </div>
                     </div>
                 </div>
@@ -161,7 +154,7 @@ class Account extends Component {
     }
 }
 // Get state from store and pass it
-const mapStateToProps = ({ accounts }) => ({
+const mapStateToProps = (accounts) => ({
     accounts
 });
 
@@ -172,6 +165,9 @@ const mapDispatchToProps = dispatch => ({
     },
     removeExistingAccount: contactID => {
         dispatch(removeAccount(contactID));
+    },
+    fetchAccount: config => {
+        dispatch(fetchArticleDetails(config));
     }
 });
 
