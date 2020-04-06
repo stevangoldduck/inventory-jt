@@ -12,7 +12,7 @@
 ### Client Info
 PT Jaya Timur is a supplier and producer company for accu battery products in Batam
 
-### Diagram Flow
+### Business Process Flow
 ![Diagram Flow](/docs/FlowChartInventJT.png)
 
 ### Implementation
