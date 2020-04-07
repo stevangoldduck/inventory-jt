@@ -16,7 +16,7 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $data = Product::all();
+        $data = Product::with(['type'=>function($query){$query->select('id','name');}])->get();
 
         return response()->json($data,200);
     }

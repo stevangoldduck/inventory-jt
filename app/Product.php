@@ -11,4 +11,9 @@ class Product extends Model
     protected $fillable = ['name','type','quantity','price'];
 
     public $timestamps = false;
+
+    public function type()
+    {
+        return $this->hasOne('App\ProductCategory','id','type');
+    }
 }
