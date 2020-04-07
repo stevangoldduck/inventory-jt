@@ -73,7 +73,14 @@ class ProductController extends Controller
      */
     public function show($id)
     {
-        //
+        $product = Product::with(['type'=>function($query){$query->select('id','name');}])->where('id',$id)->first();
+
+        if(empty($product))
+        {
+            return response()->json('Product not found',404);
+        }
+
+        return response()->json($product,200);
     }
 
     /**
@@ -150,7 +157,7 @@ class ProductController extends Controller
             return response()->json(['message'=>'Product deleted'],200);
         }
         else{
-            return response()->json(['message'=>'Product not found'],200);
+            return response()->json(['message'=>'Product not found'],404);
         }
     }
 }
