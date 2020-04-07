@@ -45,7 +45,9 @@ class ProductController extends Controller
     {
                 $validator = Validator::make($request->all(),
             [
-                'name' => 'required|unique:product'
+                'name' => 'required|min:5|unique:product',
+                'type' => 'required',
+                'price' => 'required'
             ]);
 
         if($validator->fails())
@@ -56,7 +58,7 @@ class ProductController extends Controller
         $pc = new Product();
         $pc->name = $request->name;
         $pc->type = $request->type;
-        $pc->quantity = $request->quantity;
+        $pc->quantity = $request->quantity ? $request->quantity : 0;
         $pc->price = $request->price;
         $pc->save();
 

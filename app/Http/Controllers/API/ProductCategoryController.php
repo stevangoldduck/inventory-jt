@@ -4,7 +4,10 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+
 use App\ProductCategory;
+
+use Illuminate\Validation\Rule;
 use Validator;
 
 class ProductCategoryController extends Controller
@@ -28,7 +31,7 @@ class ProductCategoryController extends Controller
      */
     public function create()
     {
-        
+
     }
 
     /**
@@ -124,7 +127,7 @@ class ProductCategoryController extends Controller
      */
     public function destroy($id)
     {
-        
+
         $pc = ProductCategory::find($id);
         $pc->delete();
 
