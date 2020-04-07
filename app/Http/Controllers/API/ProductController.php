@@ -92,7 +92,11 @@ class ProductController extends Controller
     {
         $validator = Validator::make($request->all(),
             [
+                'product_id' => 'required',
                 'name' => 'required|unique:product,name,'.$request->product_id
+            ],
+            [
+                'product_id.required' => 'You need to select a product that you want to update'
             ]);
 
         if($validator->fails())
