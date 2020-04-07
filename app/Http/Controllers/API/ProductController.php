@@ -3,8 +3,12 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+
 use App\Product;
+
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+
 use Validator;
 
 class ProductController extends Controller
@@ -93,7 +97,11 @@ class ProductController extends Controller
         $validator = Validator::make($request->all(),
             [
                 'product_id' => 'required',
-                'name' => 'required|unique:product,name,'.$request->product_id
+                'name' =>  [
+                    'required',
+                    'min:8',
+                    Rule::unique('product','name')->ignore($request->product_id,'id'),
+                ],
             ],
             [
                 'product_id.required' => 'You need to select a product that you want to update'
@@ -110,9 +118,9 @@ class ProductController extends Controller
         if(!empty($pc))
         {
             $pc->name = $request->name;
-            $pc->type = $request->type;
-            $pc->quantity = $request->quantity;
-            $pc->price = $request->price;
+            $request->type ? $pc->type = $request->type : '';
+            $request->quantity ? $pc->quantity = $request->quantity : '';
+            $request->price ? $pc->price = $request->price : '';
             $pc->save();
 
             $messages = 'Product updated';
