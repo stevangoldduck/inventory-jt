@@ -142,8 +142,13 @@ class ProductController extends Controller
     public function destroy($id)
     {
         $pc = Product::find($id);
-        $pc->delete();
-
-        return response()->json(['message'=>'Product deleted'],200);
+        if(!empty($pc))
+        {
+            $pc->delete();
+            return response()->json(['message'=>'Product deleted'],200);
+        }
+        else{
+            return response()->json(['message'=>'Product not found'],200);
+        }
     }
 }
