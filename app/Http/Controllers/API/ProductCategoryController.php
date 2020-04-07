@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
+use App\Product;
 use App\ProductCategory;
 
 use Illuminate\Validation\Rule;
@@ -44,7 +45,7 @@ class ProductCategoryController extends Controller
     {
         $validator = Validator::make($request->all(),
             [
-                'name' => 'required|unique:product_category'
+                'name' => 'required|min:3|unique:product_category'
             ]);
 
         if($validator->fails())
@@ -92,7 +93,14 @@ class ProductCategoryController extends Controller
     {
         $validator = Validator::make($request->all(),
             [
-                'name' => 'required|unique:product_category'
+                'product_category_id' => 'required',
+                'name' => [
+                    'required',
+                    'min:3',
+                    Rule::unique('product_category','name')->ignore($request->product_category_id,'id'),
+                ],
+            ],[
+                'product_category_id.required' => 'Please select product category that you want to delete'
             ]);
 
         if($validator->fails())
@@ -129,8 +137,22 @@ class ProductCategoryController extends Controller
     {
 
         $pc = ProductCategory::find($id);
-        $pc->delete();
+        if(!empty($pc))
+        {
+            $usedIn = Product::where('type',$id)->get();
+            if(!empty($usedIn))
+            {
+                return response()->json(['message'=>'Product category in use, cannot delete'],200);
+            }
 
-        return response()->json(['message'=>'Product deleted'],200);
+            $pc->delete();
+            return response()->json(['message'=>'Product deleted'],200);
+        }
+        else{
+            return response()->json(['message'=>'Product not found'],200);
+        }
+
+
+
     }
 }
