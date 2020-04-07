@@ -92,7 +92,7 @@ class ProductController extends Controller
     {
         $validator = Validator::make($request->all(),
             [
-                'name' => 'required|unique:product'
+                'name' => 'required|unique:product,name,'.$request->product_id
             ]);
 
         if($validator->fails())
