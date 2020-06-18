@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\User;
 use Validator;
 use Auth;
+use Str;
 
 class AuthController extends Controller
 {
@@ -16,8 +17,9 @@ class AuthController extends Controller
     {
         if(Auth::attempt(['email' => $req->email, 'password' => $req->password]))
         {
+            $token = Str::random(60);
             $user = Auth::user();
-            $success['token'] = $user->createToken('JayaTimur')->accessToken;
+            $success['token'] = $user->createToken($token)->accessToken;
             $success['id'] = $user->id;
             $success['name'] = $user->name;
             $success['email'] = $user->email;

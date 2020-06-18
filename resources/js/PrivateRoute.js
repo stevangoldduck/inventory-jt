@@ -1,6 +1,7 @@
 import React from 'react';
 import { Redirect, Route, withRouter } from 'react-router-dom';
 
+
 let state_of_state = localStorage["appState"];
 if (!state_of_state) {
     let appState = {

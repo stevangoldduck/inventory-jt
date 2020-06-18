@@ -4,7 +4,11 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+
+use App\Product;
 use App\ProductCategory;
+
+use Illuminate\Validation\Rule;
 use Validator;
 
 class ProductCategoryController extends Controller
@@ -28,7 +32,7 @@ class ProductCategoryController extends Controller
      */
     public function create()
     {
-        
+
     }
 
     /**
@@ -41,19 +45,19 @@ class ProductCategoryController extends Controller
     {
         $validator = Validator::make($request->all(),
             [
-                'name' => 'required|unique:product_category'
+                'name' => 'required|min:3|unique:product_category'
             ]);
 
         if($validator->fails())
         {
-            return response()->json($validator->messages(),200);
+            return response()->json(['is_success' => false, 'messages' => $validator->messages()],200);
         }
 
         $pc = new ProductCategory();
         $pc->name = $request->name;
         $pc->save();
 
-        return response()->json(['message' => 'Product category created'],200);
+        return response()->json(['is_success' => true, 'messages' => 'Product category created'],200);
     }
 
     /**
@@ -89,16 +93,23 @@ class ProductCategoryController extends Controller
     {
         $validator = Validator::make($request->all(),
             [
-                'name' => 'required|unique:product_category'
+                'id' => 'required',
+                'name' => [
+                    'required',
+                    'min:3',
+                    Rule::unique('product_category','name')->ignore($request->id,'id'),
+                ],
+            ],[
+                'id.required' => 'Please select product category that you want to delete'
             ]);
 
         if($validator->fails())
         {
-            return response()->json($validator->messages(),200);
+            return response()->json(['is_success' => false, 'messages' => $validator->messages()],200);
         }
 
         $messages = '';
-        $pc = ProductCategory::find($request->product_category_id);
+        $pc = ProductCategory::find($request->id);
 
         if(!empty($pc))
         {
@@ -112,7 +123,7 @@ class ProductCategoryController extends Controller
             $messages = 'Product category ID Not found';
         }
 
-        return response()->json(['message'=>$messages],200);
+        return response()->json(['is_success' => true,'messages'=>$messages],200);
 
     }
 
@@ -124,10 +135,24 @@ class ProductCategoryController extends Controller
      */
     public function destroy($id)
     {
-        
-        $pc = ProductCategory::find($id);
-        $pc->delete();
 
-        return response()->json(['message'=>'Product deleted'],200);
+        $pc = ProductCategory::find($id);
+        if(!empty($pc))
+        {
+            $usedIn = Product::where('type',$id)->get();
+            if(count($usedIn) > 0)
+            {
+                return response()->json(['is_success' => false,'messages'=>'Product category in use, cannot delete'],200);
+            }
+
+            $pc->delete();
+            return response()->json(['is_success' => true,'messages'=>'Product deleted'],200);
+        }
+        else{
+            return response()->json(['is_success' => false,'messages'=>'Product not found'],200);
+        }
+
+
+
     }
 }

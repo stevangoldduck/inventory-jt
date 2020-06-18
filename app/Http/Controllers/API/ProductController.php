@@ -3,8 +3,14 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+
 use App\Product;
+use App\ProductStock;
+use App\StockOutDetail;
+use App\TransferStockDetail;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+
 use Validator;
 
 class ProductController extends Controller
@@ -16,9 +22,11 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $data = Product::all();
+        $data = Product::with(['type' => function ($query) {
+            $query->select('id', 'name');
+        }])->get();
 
-        return response()->json($data,200);
+        return response()->json($data, 200);
     }
 
     /**
@@ -39,24 +47,42 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-                $validator = Validator::make($request->all(),
+        $validator = Validator::make(
+            $request->all(),
             [
-                'name' => 'required|unique:product'
-            ]);
+                'name' => 'required|min:5|unique:product',
+                'type' => 'required',
+                'price' => 'required',
+                'qty' => 'required'
+            ]
+        );
 
-        if($validator->fails())
-        {
-            return response()->json($validator->messages(),200);
+        if ($validator->fails()) {
+            return response()->json(['is_success' => false, 'messages' => $validator->messages()], 200);
         }
 
         $pc = new Product();
         $pc->name = $request->name;
         $pc->type = $request->type;
-        $pc->quantity = $request->quantity;
         $pc->price = $request->price;
         $pc->save();
 
-        return response()->json(['message' => 'Product created'],200);
+        //Auto create product stock in warehouse and store
+        //For store
+        $ps = new ProductStock();
+        $ps->product_id = $pc->id;
+        $ps->location = 1;
+        $ps->qty_stock = 0;
+        $ps->save();
+
+        //For warehouse
+        $ps = new ProductStock();
+        $ps->product_id = $pc->id;
+        $ps->location = 2;
+        $ps->qty_stock = $request->qty;
+        $ps->save();
+
+        return response()->json(['is_success' => true, 'message' => 'Product created'], 200);
     }
 
     /**
@@ -65,9 +91,15 @@ class ProductController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Request $request)
     {
-        //
+        $product = Product::where('id', $request->id)->first();
+
+        if (empty($product)) {
+            return response()->json('Product not found', 404);
+        }
+
+        return response()->json(['data' => $product], 200);
     }
 
     /**
@@ -76,9 +108,15 @@ class ProductController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Request $request)
     {
-        //
+        $product = Product::where('id', $request->id)->first();
+
+        if (empty($product)) {
+            return response()->json('Product not found', 404);
+        }
+
+        return response()->json(['data' => $product], 200);
     }
 
     /**
@@ -90,35 +128,35 @@ class ProductController extends Controller
      */
     public function update(Request $request)
     {
-        $validator = Validator::make($request->all(),
+        $validator = Validator::make(
+            $request->all(),
             [
-                'name' => 'required|unique:product'
-            ]);
+                'name' =>  [
+                    'required',
+                    Rule::unique('product', 'name')->ignore($request->id, 'id'),
+                ],
+            ]
+        );
 
-        if($validator->fails())
-        {
-            return response()->json($validator->messages(),200);
+        if ($validator->fails()) {
+            return response()->json(['is_success' => false, 'messages' => $validator->messages()], 200);
         }
 
         $messages = '';
-        $pc = Product::find($request->product_id);
+        $pc = Product::find($request->id);
 
-        if(!empty($pc))
-        {
+        if (!empty($pc)) {
             $pc->name = $request->name;
-            $pc->type = $request->type;
-            $pc->quantity = $request->quantity;
-            $pc->price = $request->price;
+            $request->type ? $pc->type = $request->type : '';
+            $request->price ? $pc->price = $request->price : '';
             $pc->save();
 
             $messages = 'Product updated';
-        }
-        else
-        {
+        } else {
             $messages = 'Product ID Not found';
         }
 
-        return response()->json(['message'=>$messages],200);
+        return response()->json(['is_success' => true,'messages' => $messages], 200);
     }
 
     /**
@@ -127,11 +165,25 @@ class ProductController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request)
     {
-        $pc = Product::find($id);
-        $pc->delete();
+        $pc = Product::find($request->id);
+        //Check product in use or not
 
-        return response()->json(['message'=>'Product deleted'],200);
+        $checkProduct = StockOutDetail::where('product_id', $request->id)->first();
+        $checkProductScnd = TransferStockDetail::where('product_id', $request->id)->first();
+        if (!empty($checkProduct) || !empty($checkProductScnd))
+            return response()->json(['is_success' => false, 'message' => 'Product in use'], 200);
+
+        if (!empty($pc)) {
+            $pc->delete();
+
+            //Delete in product stock
+            $ps = ProductStock::where('product_id',$request->id)->delete();
+
+            return response()->json(['is_success' => true, 'message' => 'Product deleted'], 200);
+        } else {
+            return response()->json(['is_success' => false, 'message' => 'Product not found'], 404);
+        }
     }
 }

@@ -1,5 +1,10 @@
 import React, { Component } from 'react'
 import Header from '../../../components/Header/Header';
+import { connect } from "react-redux";
+import { checkStock } from "../../../states/actions/dashboard_action";
+import { toastr } from 'react-redux-toastr';
+import Carousel from 'react-elastic-carousel'
+
 class Home extends Component {
     constructor() {
         super();
@@ -17,48 +22,78 @@ class Home extends Component {
         }
     }
 
+    componentDidMount() {
+        const config =
+        {
+            headers: { 'Authorization': `Bearer ${this.state.user.access_token}` }
+        }
+
+        this.props.checkWarehouseStock(config);
+        this.props.checkStoreStock(config);
+    }
+
     render() {
+        const { dashboard } = this.props
         return (
             <div>
                 <Header userData={this.state.user} userIsLoggedIn={this.state.isLoggedIn} />
                 <div className="container">
-                    <div className="row">
-                        <div className="col-sm-4 mt-5">
-                            <div className="card text-white bg-primary mb-3" style={{ maxWidth: "18 rem" }}>
-                                <div className="card-header">Sales</div>
-                                <div className="card-body text-center">
-                                    <h2 className="card-title">Rp. 5.500.000</h2>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="col-sm-4 mt-5">
-                            <div className="card text-white bg-success mb-3" style={{ maxWidth: "18 rem" }}>
-                                <div className="card-header">Total Products</div>
-                                <div className="card-body text-center">
-                                    <h2 className="card-title">34</h2>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="col-sm-4 mt-5">
-                            <div className="card text-white bg-danger mb-3" style={{ maxWidth: "18 rem" }}>
-                                <div className="card-header">Request Form</div>
-                                <div className="card-body text-center">
-                                    <h2 className="card-title">12</h2>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="col-sm-4 mt-5">
-                            <div className="card text-white bg-dark mb-3" style={{ maxWidth: "18 rem" }}>
-                                <div className="card-header">DO Form</div>
-                                <div className="card-body text-center">
-                                    <h2 className="card-title">12</h2>
-                                </div>
-                            </div>
-                        </div>
+                    <div className="row mt-5">
+                        <div className="col-lg-12"><label>Stock in store</label></div>
+                    </div>
+                    <div style={{ overflowX: "scroll", width: "100%", height: "250px", whiteSpace: "nowrap" }}>
+                        {
+                            Object.entries(dashboard.dashboard.store).map(([key, value]) => (
+                                value.map(el =>
+                                    <div className="mt-5" style={{ width: "500px", display: "inline-block", margin: "10px" }}>
+                                        <div className="card bg-default mb-3" >
+                                            <div className="card-header">{el.name}</div>
+                                            <div className="card-body text-center">
+                                                <h2 className="card-title">{el.stocks[0].qty_stock}</h2>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )
+                            ))
+                        }
+                    </div>
+                    <div className="row mt-5">
+                        <div className="col-lg-12"><label>Stock in warehouse</label></div>
+                    </div>
+                    <div style={{ overflowX: "scroll", width: "100%", height: "250px", whiteSpace: "nowrap" }}>
+                        {
+                            Object.entries(dashboard.dashboard.warehouse).map(([key, value]) => (
+                                value.map(el =>
+                                    <div className="mt-5" style={{ width: "500px", display: "inline-block", margin: "10px" }}>
+                                        <div className="card bg-default mb-3" >
+                                            <div className="card-header">{el.name}</div>
+                                            <div className="card-body text-center">
+                                                <h2 className="card-title">{el.stocks[0].qty_stock}</h2>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )
+                            ))
+                        }
                     </div>
                 </div>
             </div>
         )
     }
 }
-export default Home
+// Get state from store and pass it
+const mapStateToProps = (dashboard) => ({
+    dashboard
+});
+
+// create function for dispatching
+const mapDispatchToProps = dispatch => ({
+    checkWarehouseStock: (config) => {
+        dispatch(checkStock(2, config));
+    },
+    checkStoreStock: (config) => {
+        dispatch(checkStock(1, config));
+    },
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Home);
