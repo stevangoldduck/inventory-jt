@@ -15,8 +15,8 @@ class UserController extends Controller
 
     public function getUser()
     {
-        $data = User::all();
-        return response()->json(['list_user' => $data], $this->successStatus);
+        $data = User::get();
+        return response()->json($data, $this->successStatus);
     }
 
     public function searchUser($id)
@@ -42,11 +42,12 @@ class UserController extends Controller
         $user = new User();
         $user->name = $req->name;
         $user->email = $req->email;
-        $user->password = Hash::make($req->password);
-        $user->role = $req->role;
+        $user->password = bcrypt($req->password);
+        $user->role = $req->role ? $req->role : "admin";
         $user->save();
 
-        return response()->json(['message' => 'User added'],$this->successStatus);
+        $last_data = User::find($user->id);
+        return response()->json(['message' => 'User added', 'data' => $last_data],$this->successStatus);
     }
 
     public function deleteUser(Request $req)
@@ -54,7 +55,8 @@ class UserController extends Controller
         $data = User::find($req->id);
         $data->delete();
 
-        return response()->json(['message' => 'User deleted'], $this->successStatus);
+        $last_data = User::all();
+        return response()->json(['message' => 'User deleted', 'data' => $last_data], $this->successStatus);
     }
 
     public function updateUser(Request $req)

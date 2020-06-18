@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from "react-redux";
 import Header from '../../../components/Header/Header';
-import { addAccount, removeAccount, fetchArticleDetails } from "../../../states/actions";
+import { addAccount, removeAccount, fetchAccount } from "../../../states/actions/account_action";
 class Account extends Component {
     constructor(props) {
         super(props);
@@ -32,7 +32,7 @@ class Account extends Component {
             headers: { 'Authorization': `Bearer ${this.state.user.access_token}` }
         }
 
-        this.props.fetchAccount(config)
+        this.props.fetchAccounts(config)
     }
 
     render() {
@@ -110,8 +110,8 @@ class Account extends Component {
                                                     alert("Field cannot be empty !");
                                                     return;
                                                 }
+                                                addNewAccount({ name, email, password, role }, this.state.user.access_token);
                                                 this.setState({ name: "", email: "", password: "", role: "" });
-                                                addNewAccount({ name, email, password, role });
                                             }}
                                             className="btn btn-info"
                                         >
@@ -132,8 +132,8 @@ class Account extends Component {
                                         </thead>
                                         <tbody>
                                             {
-                                                Object.entries(accounts.accounts.items).map(([key, value]) => (
-                                                    value.map(el => <tr key={el.id}><td>{el.name}</td><td>{el.email}</td><td><button onClick={()=>{removeExistingAccount(el.id)}} className="btn btn-sm btn-danger">Delete</button></td></tr> )
+                                                Object.entries(accounts.accounts.items).map(([key, el]) => (
+                                                    <tr key={el.id}><td>{el.name}</td><td>{el.email}</td><td><button onClick={()=>{removeExistingAccount(el.id,this.state.user.access_token)}} className="btn btn-sm btn-danger">Delete</button></td></tr>
                                                 ))
                                             }
                                         </tbody>
@@ -145,7 +145,6 @@ class Account extends Component {
                     </div>
                     <div className="row">
                         <div className="col-sm-12">
-
                         </div>
                     </div>
                 </div>
@@ -160,14 +159,14 @@ const mapStateToProps = (accounts) => ({
 
 // create function for dispatching
 const mapDispatchToProps = dispatch => ({
-    addNewAccount: accounts => {
-        dispatch(addAccount(accounts));
+    addNewAccount: (account,token) => {
+        dispatch(addAccount(account,token));
     },
-    removeExistingAccount: contactID => {
-        dispatch(removeAccount(contactID));
+    removeExistingAccount: (contactID,token) => {
+        dispatch(removeAccount(contactID,token));
     },
-    fetchAccount: config => {
-        dispatch(fetchArticleDetails(config));
+    fetchAccounts: config => {
+        dispatch(fetchAccount(config));
     }
 });
 

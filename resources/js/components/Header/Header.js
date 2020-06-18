@@ -41,18 +41,17 @@ class Header extends Component {
                             <li className="nav-item dropdown">
                                 <Link className="nav-link active dropdown-toggle"  href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" >Stock Management</Link>
                                 <div className="dropdown-menu" aria-labelledby="navbarDropdown">
-                                    <a className="dropdown-item" href="#">Store</a>
-                                    <a className="dropdown-item" href="#">Warehouse</a>
+                                    <Link className="dropdown-item" to="/store">Store</Link>
+                                    <Link className="dropdown-item" to="/warehouse">Warehouse</Link>
                                 </div>
                             </li>: ""}
-                            {this.state.isLoggedIn ?
-                                <li><Link className="nav-link active" to="#">Sales</Link></li> : ""}
                             {this.state.isLoggedIn ?
                             <li className="nav-item dropdown">
                                 <Link className="nav-link active dropdown-toggle"  href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" >Products</Link>
                                 <div className="dropdown-menu" aria-labelledby="navbarDropdown">
-                                    <a className="dropdown-item" href="#">Product List</a>
-                                    <a className="dropdown-item" href="#">Product Type</a>
+                                {this.state.isLoggedIn ?
+                                <Link className="dropdown-item" to="/products">Product List</Link>: ""}
+                                    <a className="dropdown-item" href="/product-category">Product Type</a>
                                 </div>
                             </li>: ""}
 

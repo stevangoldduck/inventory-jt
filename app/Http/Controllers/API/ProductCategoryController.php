@@ -50,14 +50,14 @@ class ProductCategoryController extends Controller
 
         if($validator->fails())
         {
-            return response()->json($validator->messages(),200);
+            return response()->json(['is_success' => false, 'messages' => $validator->messages()],200);
         }
 
         $pc = new ProductCategory();
         $pc->name = $request->name;
         $pc->save();
 
-        return response()->json(['message' => 'Product category created'],200);
+        return response()->json(['is_success' => true, 'messages' => 'Product category created'],200);
     }
 
     /**
@@ -93,23 +93,23 @@ class ProductCategoryController extends Controller
     {
         $validator = Validator::make($request->all(),
             [
-                'product_category_id' => 'required',
+                'id' => 'required',
                 'name' => [
                     'required',
                     'min:3',
-                    Rule::unique('product_category','name')->ignore($request->product_category_id,'id'),
+                    Rule::unique('product_category','name')->ignore($request->id,'id'),
                 ],
             ],[
-                'product_category_id.required' => 'Please select product category that you want to delete'
+                'id.required' => 'Please select product category that you want to delete'
             ]);
 
         if($validator->fails())
         {
-            return response()->json($validator->messages(),200);
+            return response()->json(['is_success' => false, 'messages' => $validator->messages()],200);
         }
 
         $messages = '';
-        $pc = ProductCategory::find($request->product_category_id);
+        $pc = ProductCategory::find($request->id);
 
         if(!empty($pc))
         {
@@ -123,7 +123,7 @@ class ProductCategoryController extends Controller
             $messages = 'Product category ID Not found';
         }
 
-        return response()->json(['message'=>$messages],200);
+        return response()->json(['is_success' => true,'messages'=>$messages],200);
 
     }
 
@@ -140,16 +140,16 @@ class ProductCategoryController extends Controller
         if(!empty($pc))
         {
             $usedIn = Product::where('type',$id)->get();
-            if(!empty($usedIn))
+            if(count($usedIn) > 0)
             {
-                return response()->json(['message'=>'Product category in use, cannot delete'],200);
+                return response()->json(['is_success' => false,'messages'=>'Product category in use, cannot delete'],200);
             }
 
             $pc->delete();
-            return response()->json(['message'=>'Product deleted'],200);
+            return response()->json(['is_success' => true,'messages'=>'Product deleted'],200);
         }
         else{
-            return response()->json(['message'=>'Product not found'],200);
+            return response()->json(['is_success' => false,'messages'=>'Product not found'],200);
         }
 
 
