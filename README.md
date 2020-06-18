@@ -17,8 +17,9 @@ PT Jaya Timur is a supplier and producer company for accu battery products in Ba
 
 ### Implementation
 copy `.env.example` , rename to `.env` -> setup your connection to DB
+import the sql file in SQL Folder into your database.
+
 1. run `composer install`</br>
 2. `npm install && npm run dev`</br>
 3. `php artisan key:generate`</br>
-4. `php artisan migrate`</br>
-5. `php artisan passport:install`</br>
+4. `php artisan passport:install`</br>
