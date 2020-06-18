@@ -2,6 +2,9 @@
 > Web service using Laravel 6.2 </br>
 > Front-end using React.Js
 
+### API Documentation
+https://documenter.getpostman.com/view/11504450/SzzkdHFU?version=latest
+
 ### Members
 1. David 1731069 </br>
 2. Jimmy 1731079 </br>
